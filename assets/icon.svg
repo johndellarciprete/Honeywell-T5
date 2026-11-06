@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- App icon: a thermometer = the app's purpose (temperature/climate).
+     Distinct from the thermostat-dial driver icon; no clock cues. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <g fill="#000">
+    <rect x="103" y="44" width="30" height="154" rx="15"/>
+    <circle cx="118" cy="196" r="40"/>
+    <rect x="131" y="92"  width="24" height="8" rx="4"/>
+    <rect x="131" y="118" width="24" height="8" rx="4"/>
+    <rect x="131" y="144" width="24" height="8" rx="4"/>
+  </g>
+</svg>

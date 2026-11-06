@@ -1,0 +1,6 @@
+# Exclude the parked local-HomeKit driver (not part of the shipped app) and
+# dev-only cruft from the installed package.
+/_parked/
+/_photo_src/
+__pycache__/
+*.pyc

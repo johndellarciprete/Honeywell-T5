@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { margin: 0; padding: 4px 2px 16px; }
+    .field { margin: 14px 0; }
+    label.lbl { display:block; font-weight:600; margin-bottom:6px; font-size:14px; }
+    input[type=text] {
+      width:100%; padding:11px; border:1px solid #ccc; border-radius:8px;
+      box-sizing:border-box; font-size:15px;
+    }
+    #pin { font-family:monospace; font-size:18px; letter-spacing:2px; text-align:center; }
+    .hint { color:#888; font-size:12.5px; margin-top:5px; }
+    button {
+      display:block; width:100%; box-sizing:border-box; text-align:center;
+      padding:13px; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;
+      font-family:inherit; margin-top:14px; border:none; background:#E1251B; color:#fff;
+    }
+    button:hover { background:#b71d15; }
+    button.sec { border:1px solid #ccc; background:#fff; color:#444; font-size:13px; padding:9px; }
+    .acc { border:1px solid #ccc; border-radius:8px; padding:11px; margin-top:8px; cursor:pointer; }
+    .acc.sel { border-color:#E1251B; box-shadow:inset 0 0 0 1px #E1251B; }
+    .acc .nm { font-weight:600; font-size:14px; }
+    .acc .meta { color:#888; font-size:12px; margin-top:2px; }
+    .steps { background:#f6f7f9; border-radius:10px; padding:12px 14px; line-height:1.8; font-size:13px; margin-top:14px; }
+    .steps b { color:#E1251B; }
+    #error { color:#c00; margin-top:12px; min-height:18px; font-size:13.5px; }
+    h3 { margin: 6px 0 2px; font-size:15px; }
+  </style>
+</head>
+<body>
+  <div id="scanPanel">
+    <h3>Find your thermostat</h3>
+    <div class="steps">
+      <b>1.</b> On the thermostat: <b>Menu → HomeKit</b> (or <b>Reset HomeKit</b>).<br>
+      <b>2.</b> It will show an <b>8-digit setup code</b> on screen. Note it —
+      the code printed on the device or manual often does <b>not</b> work.<br>
+      <b>3.</b> Tap Scan below while that screen is showing.
+    </div>
+    <button id="scan" type="button">Scan network</button>
+    <div id="list"></div>
+  </div>
+
+  <div id="pinPanel" style="display:none">
+    <label class="lbl" for="pin">Setup code shown on the thermostat</label>
+    <input type="text" id="pin" placeholder="123-45-678" inputmode="numeric"
+           autocapitalize="off" autocorrect="off" spellcheck="false">
+    <div class="hint">8 digits. Dashes optional.</div>
+    <button id="pairBtn" type="button">Pair</button>
+    <button id="back" class="sec" type="button">Back to scan</button>
+  </div>
+
+  <div id="error"></div>
+
+  <script type="application/javascript">
+    function $(id) { return document.getElementById(id); }
+    var selected = null;
+
+    // Single-view pairing: on this Homey build every view after the first
+    // renders blank, so we never navigate — we call Homey.createDevice() here.
+    function render(accs) {
+      var list = $('list');
+      list.innerHTML = '';
+      var usable = accs.filter(function (a) { return !a.paired; });
+      if (!usable.length) {
+        var msg = accs.length
+          ? 'Found ' + accs.length + ' HomeKit accessory(ies), but all are already paired. '
+            + 'Run "Reset HomeKit" on the thermostat, then scan again.'
+          : 'No HomeKit accessories found. Make sure the thermostat is on the same '
+            + 'Wi-Fi as Homey and its HomeKit screen is open, then scan again.';
+        $('error').style.color = '#c00';
+        $('error').textContent = msg;
+        return;
+      }
+      $('error').textContent = '';
+      usable.forEach(function (a) {
+        var d = document.createElement('div');
+        d.className = 'acc' + (a.is_thermostat ? ' sel' : '');
+        d.innerHTML = '<div class="nm"></div><div class="meta"></div>';
+        d.querySelector('.nm').textContent = a.name;
+        d.querySelector('.meta').textContent =
+          (a.model ? a.model + ' · ' : '') + a.category;
+        d.addEventListener('click', function () {
+          selected = a;
+          $('scanPanel').style.display = 'none';
+          $('pinPanel').style.display = 'block';
+          $('error').textContent = '';
+        });
+        list.appendChild(d);
+      });
+    }
+
+    $('scan').addEventListener('click', async function () {
+      $('error').style.color = '#c00';
+      $('error').textContent = '';
+      try {
+        Homey.showLoadingOverlay();
+        var res = await Homey.emit('discover', {});
+        Homey.hideLoadingOverlay();
+        render((res && res.accessories) || []);
+      } catch (e) {
+        Homey.hideLoadingOverlay();
+        $('error').textContent = (e && e.message) ? e.message : String(e);
+      }
+    });
+
+    $('back').addEventListener('click', function () {
+      $('pinPanel').style.display = 'none';
+      $('scanPanel').style.display = 'block';
+      $('error').textContent = '';
+    });
+
+    $('pairBtn').addEventListener('click', async function () {
+      var pin = $('pin').value.trim();
+      $('error').style.color = '#c00';
+      $('error').textContent = '';
+      if (!selected) { $('error').textContent = 'Pick an accessory first.'; return; }
+      if (!pin) { $('error').textContent = 'Enter the setup code from the screen.'; return; }
+      try {
+        Homey.showLoadingOverlay();
+        var dev = await Homey.emit('pair_device', {
+          device_id: selected.id, pin: pin, name: selected.name
+        });
+        if (!dev) { throw new Error('No response from the app.'); }
+        await Homey.createDevice(dev);
+        Homey.hideLoadingOverlay();
+        $('error').style.color = '#0d652d';
+        $('error').textContent = 'Paired. Finishing…';
+        await Homey.done();
+      } catch (e) {
+        Homey.hideLoadingOverlay();
+        $('error').textContent = (e && e.message) ? e.message : String(e);
+      }
+    });
+
+    try { Homey.setTitle('Add T5 (local)'); } catch (e) {}
+  </script>
+</body>
+</html>

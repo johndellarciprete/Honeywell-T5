@@ -1,0 +1,493 @@
+{
+  "id": "com.dellarciprete.honeywellt5",
+  "version": "1.3.0",
+  "compatibility": ">=13.0.0",
+  "sdk": 3,
+  "runtime": "python",
+  "pythonVersion": "3.13",
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "Honeywell Home"
+  },
+  "description": {
+    "en": "Your home's temperature, right from Homey."
+  },
+  "category": [
+    "climate"
+  ],
+  "permissions": [],
+  "author": {
+    "name": "John Dell'Arciprete",
+    "email": "johndellarciprete@gmail.com"
+  },
+  "homepage": "https://github.com/johndellarciprete/Honeywell-T5",
+  "source": "https://github.com/johndellarciprete/Honeywell-T5",
+  "support": "https://github.com/johndellarciprete/Honeywell-T5/issues",
+  "bugs": {
+    "url": "https://github.com/johndellarciprete/Honeywell-T5/issues"
+  },
+  "license": "MIT",
+  "brandColor": "#E1251B",
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "capabilities": {
+    "honeywell_fan_mode": {
+      "type": "enum",
+      "title": {
+        "en": "Fan"
+      },
+      "uiComponent": "sensor",
+      "icon": "/assets/icons/fan.svg",
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "values": [
+        {
+          "id": "auto",
+          "title": {
+            "en": "Auto"
+          }
+        },
+        {
+          "id": "on",
+          "title": {
+            "en": "On"
+          }
+        },
+        {
+          "id": "circulate",
+          "title": {
+            "en": "Circulate"
+          }
+        }
+      ]
+    },
+    "honeywell_operating_state": {
+      "type": "enum",
+      "title": {
+        "en": "Operating State"
+      },
+      "uiComponent": "sensor",
+      "icon": "/assets/icons/state.svg",
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "values": [
+        {
+          "id": "idle",
+          "title": {
+            "en": "Idle"
+          }
+        },
+        {
+          "id": "heating",
+          "title": {
+            "en": "Heating"
+          }
+        },
+        {
+          "id": "cooling",
+          "title": {
+            "en": "Cooling"
+          }
+        },
+        {
+          "id": "fan",
+          "title": {
+            "en": "Fan only"
+          }
+        }
+      ]
+    }
+  },
+  "drivers": [
+    {
+      "id": "thermostat",
+      "name": {
+        "en": "Honeywell Thermostat"
+      },
+      "class": "thermostat",
+      "capabilities": [
+        "measure_temperature",
+        "measure_humidity",
+        "target_temperature",
+        "thermostat_mode",
+        "honeywell_fan_mode",
+        "honeywell_operating_state"
+      ],
+      "capabilitiesOptions": {
+        "thermostat_mode": {
+          "insights": true,
+          "values": [
+            {
+              "id": "off",
+              "title": {
+                "en": "Off"
+              }
+            },
+            {
+              "id": "heat",
+              "title": {
+                "en": "Heat"
+              }
+            },
+            {
+              "id": "cool",
+              "title": {
+                "en": "Cool"
+              }
+            },
+            {
+              "id": "auto",
+              "title": {
+                "en": "Auto"
+              }
+            }
+          ]
+        },
+        "target_temperature": {
+          "min": 5,
+          "max": 35,
+          "step": 0.1,
+          "decimals": 1,
+          "insights": true
+        },
+        "measure_temperature": {
+          "decimals": 1,
+          "insights": true
+        },
+        "measure_humidity": {
+          "insights": true
+        }
+      },
+      "platforms": [
+        "local"
+      ],
+      "images": {
+        "small": "/drivers/thermostat/assets/images/small.png",
+        "large": "/drivers/thermostat/assets/images/large.png",
+        "xlarge": "/drivers/thermostat/assets/images/xlarge.png"
+      },
+      "pair": [
+        {
+          "id": "login_oauth2",
+          "template": "login_oauth2",
+          "options": {
+            "hint": "Sign in with your Honeywell Home or First Alert account.",
+            "button": "Sign in with Honeywell"
+          }
+        },
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Recent activity"
+          },
+          "children": [
+            {
+              "id": "events_hint",
+              "type": "label",
+              "label": {
+                "en": "Newest first"
+              },
+              "value": "Mode, setpoint, and status changes are listed here."
+            },
+            {
+              "id": "event_1",
+              "type": "label",
+              "label": {
+                "en": "•"
+              },
+              "value": "—"
+            },
+            {
+              "id": "event_2",
+              "type": "label",
+              "label": {
+                "en": "•"
+              },
+              "value": "—"
+            },
+            {
+              "id": "event_3",
+              "type": "label",
+              "label": {
+                "en": "•"
+              },
+              "value": "—"
+            },
+            {
+              "id": "event_4",
+              "type": "label",
+              "label": {
+                "en": "•"
+              },
+              "value": "—"
+            },
+            {
+              "id": "event_5",
+              "type": "label",
+              "label": {
+                "en": "•"
+              },
+              "value": "—"
+            },
+            {
+              "id": "event_6",
+              "type": "label",
+              "label": {
+                "en": "•"
+              },
+              "value": "—"
+            },
+            {
+              "id": "event_7",
+              "type": "label",
+              "label": {
+                "en": "•"
+              },
+              "value": "—"
+            },
+            {
+              "id": "event_8",
+              "type": "label",
+              "label": {
+                "en": "•"
+              },
+              "value": "—"
+            },
+            {
+              "id": "event_9",
+              "type": "label",
+              "label": {
+                "en": "•"
+              },
+              "value": "—"
+            },
+            {
+              "id": "event_10",
+              "type": "label",
+              "label": {
+                "en": "•"
+              },
+              "value": "—"
+            },
+            {
+              "id": "event_11",
+              "type": "label",
+              "label": {
+                "en": "•"
+              },
+              "value": "—"
+            },
+            {
+              "id": "event_12",
+              "type": "label",
+              "label": {
+                "en": "•"
+              },
+              "value": "—"
+            },
+            {
+              "id": "event_13",
+              "type": "label",
+              "label": {
+                "en": "•"
+              },
+              "value": "—"
+            },
+            {
+              "id": "event_14",
+              "type": "label",
+              "label": {
+                "en": "•"
+              },
+              "value": "—"
+            },
+            {
+              "id": "event_15",
+              "type": "label",
+              "label": {
+                "en": "•"
+              },
+              "value": "—"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "flow": {
+    "triggers": [
+      {
+        "id": "temperature_changed",
+        "title": {
+          "en": "Indoor temperature changed"
+        },
+        "titleFormatted": {
+          "en": "Indoor temperature changed"
+        },
+        "tokens": [
+          {
+            "name": "temperature",
+            "type": "number",
+            "title": {
+              "en": "Temperature"
+            },
+            "example": 21.5
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=thermostat"
+          }
+        ]
+      },
+      {
+        "id": "mode_changed",
+        "title": {
+          "en": "Mode changed"
+        },
+        "titleFormatted": {
+          "en": "Mode changed"
+        },
+        "tokens": [
+          {
+            "name": "mode",
+            "type": "string",
+            "title": {
+              "en": "Mode"
+            },
+            "example": "heat"
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=thermostat"
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "set_mode",
+        "title": {
+          "en": "Set mode"
+        },
+        "titleFormatted": {
+          "en": "Set mode to [[mode]]"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=thermostat"
+          },
+          {
+            "type": "dropdown",
+            "name": "mode",
+            "title": {
+              "en": "Mode"
+            },
+            "values": [
+              {
+                "id": "off",
+                "title": {
+                  "en": "Off"
+                }
+              },
+              {
+                "id": "heat",
+                "title": {
+                  "en": "Heat"
+                }
+              },
+              {
+                "id": "cool",
+                "title": {
+                  "en": "Cool"
+                }
+              },
+              {
+                "id": "auto",
+                "title": {
+                  "en": "Auto"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "set_heat_cool",
+        "title": {
+          "en": "Set heating and cooling setpoints"
+        },
+        "titleFormatted": {
+          "en": "Set heating to [[heat]] and cooling to [[cool]]"
+        },
+        "hint": {
+          "en": "Sets both setpoints at once — use this for Auto mode. Enter the values in your thermostat's own unit (°F or °C, whatever it shows). Keep a gap of a few degrees between them."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=thermostat"
+          },
+          {
+            "type": "number",
+            "name": "heat",
+            "title": {
+              "en": "Heat to"
+            },
+            "min": 1,
+            "max": 99,
+            "step": 0.5,
+            "placeholder": {
+              "en": "e.g. 65"
+            }
+          },
+          {
+            "type": "number",
+            "name": "cool",
+            "title": {
+              "en": "Cool to"
+            },
+            "min": 1,
+            "max": 99,
+            "step": 0.5,
+            "placeholder": {
+              "en": "e.g. 75"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "pythonPackages": [
+    "aiohttp",
+    "certifi"
+  ]
+}
